@@ -12,16 +12,50 @@ export default function Timer({ elapsedSeconds, textColor }: TimerProps) {
     return `${hours}:${minutes}:${seconds}`;
   };
 
+  // Calculate pulse animation speed based on elapsed time
+  // Slower pulse at the beginning, faster as time goes on
+  const pulseSpeed = Math.max(3 - (elapsedSeconds / 120), 1); // Minimum 1s, maximum 3s
+  
   return (
     <div 
-      className="absolute bottom-8 font-mono text-sm md:text-base opacity-30 hover:opacity-70 transition-opacity duration-300"
+      className="absolute bottom-8 font-mono text-sm md:text-base opacity-30 hover:opacity-80 transition-all duration-700"
       style={{ 
-        transition: "color 7s ease",
+        transition: "color 10s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s ease",
         color: textColor,
-        fontFamily: "'Space Mono', monospace" 
+        fontFamily: "'Space Mono', monospace",
+        letterSpacing: '0.05em',
+        padding: '0.5rem 1rem',
+        borderRadius: '3px',
+        transform: 'translateY(0)',
+      }}
+      onMouseEnter={(e) => {
+        // Apply slight upward movement on hover
+        (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-3px)';
+      }}
+      onMouseLeave={(e) => {
+        (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)';
       }}
     >
-      {formatTime(elapsedSeconds)}
+      <div 
+        className="relative z-10"
+        style={{
+          animation: `pulse ${pulseSpeed}s infinite alternate ease-in-out`,
+        }}
+      >
+        {formatTime(elapsedSeconds)}
+      </div>
+      
+      {/* Add subtle styling to the global CSS for the pulse animation */}
+      <style jsx global>{`
+        @keyframes pulse {
+          0% {
+            opacity: 0.7;
+          }
+          100% {
+            opacity: 1;
+          }
+        }
+      `}</style>
     </div>
   );
 }

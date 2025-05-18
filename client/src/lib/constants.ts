@@ -1,15 +1,21 @@
-// Color stages from light to dark
+// Color stages from light to dark with a more aesthetic transition
 export const colorStages = [
-  { bg: '#f8f9fa', text: '#212529' }, // Very light gray
-  { bg: '#e9ecef', text: '#212529' },
-  { bg: '#dee2e6', text: '#212529' },
-  { bg: '#ced4da', text: '#212529' },
-  { bg: '#adb5bd', text: '#212529' },
-  { bg: '#6c757d', text: '#f8f9fa' },
-  { bg: '#495057', text: '#f8f9fa' },
-  { bg: '#343a40', text: '#f8f9fa' },
-  { bg: '#212529', text: '#f8f9fa' },
-  { bg: '#121212', text: '#f8f9fa' }  // Near black
+  { bg: '#ffffff', text: '#1a1a1a' }, // Pure white
+  { bg: '#f7f7f7', text: '#1a1a1a' }, // Almost white
+  { bg: '#f0f0f0', text: '#1a1a1a' }, // Light gray
+  { bg: '#e6e6fa', text: '#1a1a1a' }, // Lavender
+  { bg: '#dfe7f2', text: '#1a1a1a' }, // Light blue-gray
+  { bg: '#d0dbe5', text: '#1a1a1a' }, // Light steel blue
+  { bg: '#b0c4de', text: '#1a1a1a' }, // Light steel blue
+  { bg: '#8fa6bc', text: '#f7f7f7' }, // Steel blue 
+  { bg: '#6d87a8', text: '#f7f7f7' }, // Medium blue
+  { bg: '#4b6990', text: '#f7f7f7' }, // Denim
+  { bg: '#3a5277', text: '#f7f7f7' }, // Slate blue
+  { bg: '#2c3e50', text: '#f7f7f7' }, // Dark slate
+  { bg: '#1e2a3a', text: '#f7f7f7' }, // Very dark blue
+  { bg: '#121920', text: '#f7f7f7' }, // Almost black-blue
+  { bg: '#080c10', text: '#f7f7f7' }, // Near black
+  { bg: '#000000', text: '#f7f7f7' }  // Pure black
 ];
 
 // Level definitions - how many seconds to reach each level
