@@ -7,9 +7,11 @@ import { colorStages } from "@/lib/constants";
 export default function Home() {
   const [currentColorIndex, setCurrentColorIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const { elapsedSeconds, level, levelInfo, startTimer } = useNothingLevel();
+  const [seconds, setSeconds] = useState(0);
+  const { level, levelInfo, startTimer } = useNothingLevel();
   const transitionTimeRef = useRef(7000); // Set to 7 seconds as requested
   const intervalRef = useRef<number | null>(null);
+  const timerRef = useRef<number | null>(null);
   
   // Set page title and prevent interactions
   useEffect(() => {
@@ -29,9 +31,27 @@ export default function Home() {
     };
   }, []);
 
-  // Start timer when component mounts
+  // Start a simple timer counter to track seconds
   useEffect(() => {
+    // Clear any existing timer
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+    
+    // Start a new timer that increments every second
+    timerRef.current = window.setInterval(() => {
+      setSeconds(prev => prev + 1);
+    }, 1000);
+    
+    // Also call the nothingness level tracker
     startTimer();
+    
+    // Clean up on unmount
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
   }, [startTimer]);
 
   // Color transition logic - fixed at 7 seconds
@@ -100,7 +120,7 @@ export default function Home() {
       />
       
       <Timer 
-        elapsedSeconds={elapsedSeconds}
+        elapsedSeconds={seconds}
         textColor={text}
       />
     </main>
