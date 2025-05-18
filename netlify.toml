@@ -1,9 +1,9 @@
 # netlify.toml
 [build]
-  command = "npm run build"
+  command = "chmod +x netlify-build.sh && ./netlify-build.sh"
   publish = "dist"
   
-# Handle SPA routing
+# Handle SPA routing - this is crucial for the app to work correctly
 [[redirects]]
   from = "/*"
   to = "/index.html"
@@ -12,3 +12,4 @@
 # Environment variables for the frontend
 [build.environment]
   NODE_VERSION = "20"
+  NODE_ENV = "production"

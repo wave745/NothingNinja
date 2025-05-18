@@ -69,3 +69,7 @@
     opacity: 1;
   }
 }
+
+.pulse-animation {
+  animation-name: pulse;
+}

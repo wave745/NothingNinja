@@ -37,10 +37,12 @@ export default function Timer({ elapsedSeconds, textColor }: TimerProps) {
       }}
     >
       <div 
-        className="relative z-10"
+        className="relative z-10 pulse-animation"
         style={{
-          animation: `${pulseSpeed}s infinite alternate ease-in-out`,
-          animationName: "pulse"
+          animationDuration: `${pulseSpeed}s`,
+          animationIterationCount: "infinite",
+          animationDirection: "alternate",
+          animationTimingFunction: "ease-in-out"
         }}
       >
         {formatTime(elapsedSeconds)}
