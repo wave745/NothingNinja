@@ -1,0 +1,16 @@
+# Netlify configuration for the frontend-only build
+[build]
+  base = "."
+  publish = "dist"
+  command = "npm run build" 
+
+# Handle SPA routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Environment variables
+[build.environment]
+  NODE_VERSION = "20"
+  NODE_ENV = "production"
