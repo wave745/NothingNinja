@@ -8,7 +8,8 @@ export default function Home() {
   const [currentColorIndex, setCurrentColorIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const { elapsedSeconds, level, levelInfo, startTimer } = useNothingLevel();
-  const transitionTimeRef = useRef(10000); // Initial transition time: 10 seconds
+  const transitionTimeRef = useRef(7000); // Set to 7 seconds as requested
+  const intervalRef = useRef<number | null>(null);
   
   // Set page title and prevent interactions
   useEffect(() => {
@@ -33,20 +34,15 @@ export default function Home() {
     startTimer();
   }, [startTimer]);
 
-  // Advanced color transition logic
+  // Color transition logic - fixed at 7 seconds
   useEffect(() => {
-    // Gradually decrease transition time as level increases (slower to faster)
-    if (level <= 2) {
-      transitionTimeRef.current = 10000; // 10 seconds for early levels
-    } else if (level <= 4) {
-      transitionTimeRef.current = 8000; // 8 seconds for middle levels
-    } else if (level <= 6) {
-      transitionTimeRef.current = 6000; // 6 seconds for higher levels
-    } else {
-      transitionTimeRef.current = 5000; // 5 seconds for highest levels
+    // Clear any existing interval to prevent duplicates
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
     }
     
-    const colorChangeInterval = setInterval(() => {
+    // Set a consistent 7-second interval for color changes
+    intervalRef.current = window.setInterval(() => {
       setIsTransitioning(true);
       setCurrentColorIndex((prevIndex) => (prevIndex + 1) % colorStages.length);
       
@@ -54,10 +50,14 @@ export default function Home() {
       setTimeout(() => {
         setIsTransitioning(false);
       }, 500);
-    }, transitionTimeRef.current);
+    }, 7000);
 
-    return () => clearInterval(colorChangeInterval);
-  }, [level]);
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, []); // Empty dependency array so it only runs once
 
   // Get current colors from colorStages
   const { bg, text } = colorStages[currentColorIndex];
@@ -67,7 +67,7 @@ export default function Home() {
       style={{ 
         backgroundColor: bg,
         color: text,
-        transition: `background-color ${transitionTimeRef.current/1000}s cubic-bezier(0.4, 0, 0.2, 1), color ${transitionTimeRef.current/1000}s cubic-bezier(0.4, 0, 0.2, 1)`,
+        transition: "background-color 7s cubic-bezier(0.4, 0, 0.2, 1), color 7s cubic-bezier(0.4, 0, 0.2, 1)",
         overflow: "hidden",
         height: "100vh",
         width: "100vw",
@@ -87,7 +87,7 @@ export default function Home() {
         style={{
           background: `radial-gradient(circle at center, ${bg}00 0%, ${bg} 70%)`,
           opacity: 0.7,
-          transition: `opacity ${transitionTimeRef.current/1000}s ease`
+          transition: "opacity 7s ease"
         }}
       />
       
@@ -96,6 +96,7 @@ export default function Home() {
         levelName={levelInfo.name}
         message={levelInfo.message} 
         textColor={text}
+        showPhrase="You are experiencing Nothingly" // This will be the constant phrase
       />
       
       <Timer 

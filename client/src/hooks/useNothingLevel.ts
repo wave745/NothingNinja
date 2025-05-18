@@ -11,60 +11,78 @@ interface UseNothingLevelResult {
 }
 
 export default function useNothingLevel(): UseNothingLevelResult {
-  const [startTime, setStartTime] = useState<Date | null>(null);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [level, setLevel] = useState(0);
-  const [pausedAt, setPausedAt] = useState<number | null>(null);
+  const [isActive, setIsActive] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
   
-  const intervalRef = useRef<number | null>(null);
+  const countRef = useRef<number | null>(null);
+  const startTimeRef = useRef<number | null>(null);
 
   // Get the current level info based on time spent
   const levelInfo = levels.find((_, index) => index === level) || levels[0];
 
   // Start the timer
   const startTimer = useCallback(() => {
-    setStartTime(new Date());
+    setIsActive(true);
+    setIsPaused(false);
     
-    if (intervalRef.current) {
-      window.clearInterval(intervalRef.current);
+    // Clear any existing interval
+    if (countRef.current) {
+      window.clearInterval(countRef.current);
     }
     
-    intervalRef.current = window.setInterval(() => {
-      if (startTime) {
-        const now = new Date();
-        const secondsElapsed = Math.floor((now.getTime() - startTime.getTime()) / 1000);
+    // Set the start time if it's not already set
+    if (!startTimeRef.current) {
+      startTimeRef.current = Date.now() - (elapsedSeconds * 1000);
+    }
+    
+    // Start a new interval
+    countRef.current = window.setInterval(() => {
+      if (startTimeRef.current) {
+        const now = Date.now();
+        const secondsElapsed = Math.floor((now - startTimeRef.current) / 1000);
         setElapsedSeconds(secondsElapsed);
       }
     }, 1000);
-  }, [startTime]);
-
-  // Pause the timer (when tab is not visible)
-  const pauseTimer = useCallback(() => {
-    if (intervalRef.current) {
-      window.clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
-    setPausedAt(elapsedSeconds);
   }, [elapsedSeconds]);
 
-  // Resume the timer (when tab becomes visible again)
-  const resumeTimer = useCallback(() => {
-    if (pausedAt !== null && startTime) {
-      // Adjust the start time to account for the paused duration
-      const newStartTime = new Date();
-      newStartTime.setTime(newStartTime.getTime() - (pausedAt * 1000));
-      setStartTime(newStartTime);
-      setPausedAt(null);
-      startTimer();
+  // Pause the timer
+  const pauseTimer = useCallback(() => {
+    if (countRef.current) {
+      clearInterval(countRef.current);
+      countRef.current = null;
     }
-  }, [pausedAt, startTimer, startTime]);
+    setIsPaused(true);
+  }, []);
+
+  // Resume the timer
+  const resumeTimer = useCallback(() => {
+    if (isPaused) {
+      setIsPaused(false);
+      
+      // Adjust start time to account for the time spent paused
+      if (startTimeRef.current) {
+        startTimeRef.current = Date.now() - (elapsedSeconds * 1000);
+      }
+      
+      // Start a new interval
+      countRef.current = window.setInterval(() => {
+        if (startTimeRef.current) {
+          const now = Date.now();
+          const secondsElapsed = Math.floor((now - startTimeRef.current) / 1000);
+          setElapsedSeconds(secondsElapsed);
+        }
+      }, 1000);
+    }
+  }, [elapsedSeconds, isPaused]);
 
   // Handle visibility change to pause/resume timer
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'hidden') {
         pauseTimer();
-      } else if (document.visibilityState === 'visible') {
+      } else if (document.visibilityState === 'visible' && isActive && isPaused) {
         resumeTimer();
       }
     };
@@ -73,11 +91,11 @@ export default function useNothingLevel(): UseNothingLevelResult {
     
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
-      if (intervalRef.current) {
-        window.clearInterval(intervalRef.current);
+      if (countRef.current) {
+        window.clearInterval(countRef.current);
       }
     };
-  }, [pauseTimer, resumeTimer]);
+  }, [isActive, isPaused, pauseTimer, resumeTimer]);
 
   // Update the level based on elapsed time
   useEffect(() => {
@@ -90,6 +108,15 @@ export default function useNothingLevel(): UseNothingLevelResult {
       }
     }
   }, [elapsedSeconds, level]);
+
+  // Clean up on unmount
+  useEffect(() => {
+    return () => {
+      if (countRef.current) {
+        window.clearInterval(countRef.current);
+      }
+    };
+  }, []);
 
   return {
     elapsedSeconds,

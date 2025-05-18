@@ -20,7 +20,7 @@ export default function Timer({ elapsedSeconds, textColor }: TimerProps) {
     <div 
       className="absolute bottom-8 font-mono text-sm md:text-base opacity-30 hover:opacity-80 transition-all duration-700"
       style={{ 
-        transition: "color 10s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s ease",
+        transition: "color 7s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s ease",
         color: textColor,
         fontFamily: "'Space Mono', monospace",
         letterSpacing: '0.05em',
@@ -39,23 +39,12 @@ export default function Timer({ elapsedSeconds, textColor }: TimerProps) {
       <div 
         className="relative z-10"
         style={{
-          animation: `pulse ${pulseSpeed}s infinite alternate ease-in-out`,
+          animation: `${pulseSpeed}s infinite alternate ease-in-out`,
+          animationName: "pulse"
         }}
       >
         {formatTime(elapsedSeconds)}
       </div>
-      
-      {/* Add subtle styling to the global CSS for the pulse animation */}
-      <style jsx global>{`
-        @keyframes pulse {
-          0% {
-            opacity: 0.7;
-          }
-          100% {
-            opacity: 1;
-          }
-        }
-      `}</style>
     </div>
   );
 }
